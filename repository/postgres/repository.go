@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/go-url-shortener/shortener"
@@ -50,7 +49,6 @@ func (r *postgresRepository) Find(code string) (*shortener.Redirect, error) {
 }
 
 func (r *postgresRepository) Store(redirect *shortener.Redirect) error {
-	fmt.Println(redirect)
 	query := "INSERT INTO redirects (code, url, created_at) VALUES ($1, $2, $3)"
 	_, err := r.db.Exec(query, redirect.Code, redirect.URL, time.Unix(redirect.CreatedAt, 0))
 	if err != nil {
