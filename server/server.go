@@ -10,6 +10,7 @@ import (
 	"github.com/go-url-shortener/repository/redis"
 	"github.com/go-url-shortener/shortener"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func NewServer() http.Handler {
@@ -26,7 +27,10 @@ func NewServer() http.Handler {
 	service := shortener.NewRedirectService(cachedRepository)
 	handler := h.NewHandler(service)
 
+	r.Use(TrackApiCalls)
 	r.HandleFunc("/{code}", handler.Get).Methods("GET")
 	r.HandleFunc("/store", handler.Post).Methods("POST")
+	http.Handle("/metrics", promhttp.Handler())
+
 	return r
 }
