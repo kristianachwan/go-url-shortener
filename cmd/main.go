@@ -2,17 +2,25 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/go-kit/log"
+
 	"github.com/go-url-shortener/server"
 )
 
 func main() {
-	srv := server.NewServer()
+	var logger log.Logger
+	{
+		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.With(logger, "ts", log.DefaultTimestampUTC)
+		logger = log.With(logger, "caller", log.DefaultCaller)
+	}
+	srv := server.NewServer(logger)
+
 	errs := make(chan error)
 
 	go func() {
@@ -26,8 +34,11 @@ func main() {
 			Addr:    ":8080",
 			Handler: srv,
 		}
+		logger.Log(
+			"started at port", "8080",
+		)
 		errs <- server.ListenAndServe()
 	}()
 	err := <-errs
-	log.Fatal(err)
+	logger.Log(err)
 }

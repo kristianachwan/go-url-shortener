@@ -1,9 +1,9 @@
 package server
 
 import (
-	"log"
 	"net/http"
 
+	"github.com/go-kit/log"
 	h "github.com/go-url-shortener/api"
 	"github.com/go-url-shortener/repository/cachedpostgres"
 	"github.com/go-url-shortener/repository/postgres"
@@ -13,18 +13,19 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func NewServer() http.Handler {
+func NewServer(logger log.Logger) http.Handler {
 	r := mux.NewRouter()
 	// for now, just postgres
 	repo, err := postgres.NewPostgresRepository("postgres://myuser:mypassword@localhost:5432/mydatabase?sslmode=disable")
 	redisRepo, err := redis.NewRedisRepository("redis://127.0.0.1:6379")
 	if err != nil {
-		log.Fatal(err)
+		logger.Log("error", err)
 	}
 
 	cachedRepository := cachedpostgres.NewCachedRepository(repo, redisRepo)
 
 	service := shortener.NewRedirectService(cachedRepository)
+	service = NewLoggingMiddleware(logger, service)
 	handler := h.NewHandler(service)
 
 	r.Use(TrackApiCalls)
