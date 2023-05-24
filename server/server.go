@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-kit/log"
 	h "github.com/go-url-shortener/api"
+	"github.com/go-url-shortener/middleware"
 	"github.com/go-url-shortener/repository/cachedpostgres"
 	"github.com/go-url-shortener/repository/postgres"
 	"github.com/go-url-shortener/repository/redis"
@@ -24,10 +25,10 @@ func NewServer(logger log.Logger) http.Handler {
 	cachedRepository := cachedpostgres.NewCachedRepository(repo, redisRepo)
 
 	service := shortener.NewRedirectService(cachedRepository)
-	service = NewLoggingMiddleware(logger, service)
+	service = middleware.NewLoggingMiddleware(logger, service)
 	handler := h.NewHandler(service)
 
-	r.Use(TrackApiCalls)
+	r.Use(middleware.TrackApiCalls)
 	r.HandleFunc("/metrics", promhttp.Handler().ServeHTTP)
 
 	r.HandleFunc("/{code}", handler.Get).Methods("GET")

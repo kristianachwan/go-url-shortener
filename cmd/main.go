@@ -35,7 +35,7 @@ func main() {
 			Handler: srv,
 		}
 		logger.Log(
-			"started at port", "8080",
+			"started_at_port", "8080",
 		)
 		errs <- server.ListenAndServe()
 	}()
