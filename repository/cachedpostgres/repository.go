@@ -18,7 +18,6 @@ func (r *cachedRepository) Find(code string) (*shortener.Redirect, error) {
 	redirect, err := r.redisRepository.Find(code)
 	if err == nil {
 		return redirect, nil
-
 	}
 
 	redirect, err = r.repository.Find(code)
@@ -30,4 +29,16 @@ func (r *cachedRepository) Find(code string) (*shortener.Redirect, error) {
 
 func (r *cachedRepository) Store(redirect *shortener.Redirect) error {
 	return r.repository.Store(redirect)
+}
+
+func (r *cachedRepository) Delete(code string) error {
+	if err := r.repository.Delete(code); err != nil {
+		return err
+	}
+
+	if err := r.redisRepository.Delete(code); err != nil {
+		return err
+	}
+
+	return nil
 }

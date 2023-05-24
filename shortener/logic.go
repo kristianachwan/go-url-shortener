@@ -36,3 +36,7 @@ func (r *redirectService) Store(redirect *Redirect) error {
 
 	return r.redirectRepo.Store(redirect)
 }
+
+func (r *redirectService) Delete(code string) error {
+	return r.redirectRepo.Delete(code)
+}

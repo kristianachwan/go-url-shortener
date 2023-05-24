@@ -75,3 +75,14 @@ func (r *redisRepository) Store(redirect *shortener.Redirect) error {
 	}
 	return nil
 }
+
+func (r *redisRepository) Delete(code string) error {
+	key := r.generateKey(code)
+	_, err := r.client.Del(key).Result()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

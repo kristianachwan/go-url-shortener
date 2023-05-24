@@ -43,3 +43,16 @@ func (mw loggingMiddleware) Store(redirect *shortener.Redirect) (err error) {
 	err = mw.next.Store(redirect)
 	return
 }
+
+func (mw loggingMiddleware) Delete(code string) (err error) {
+	defer func(begin time.Time) {
+		_ = mw.logger.Log(
+			"method", "delete",
+			"input", code,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+
+	err = mw.next.Delete(code)
+	return
+}

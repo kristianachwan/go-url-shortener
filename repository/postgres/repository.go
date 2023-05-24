@@ -57,3 +57,14 @@ func (r *postgresRepository) Store(redirect *shortener.Redirect) error {
 
 	return nil
 }
+
+func (r *postgresRepository) Delete(code string) error {
+	query := "DELETE FROM redirects WHERE code == $1"
+	_, err := r.db.Exec(query, code)
+
+	if err != nil {
+		return errors.Wrap(err, "repository.Redirect.Delete")
+	}
+
+	return nil
+}
