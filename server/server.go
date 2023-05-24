@@ -28,9 +28,10 @@ func NewServer() http.Handler {
 	handler := h.NewHandler(service)
 
 	r.Use(TrackApiCalls)
+	r.HandleFunc("/metrics", promhttp.Handler().ServeHTTP)
+
 	r.HandleFunc("/{code}", handler.Get).Methods("GET")
 	r.HandleFunc("/store", handler.Post).Methods("POST")
-	http.Handle("/metrics", promhttp.Handler())
 
 	return r
 }
