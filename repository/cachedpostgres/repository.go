@@ -16,16 +16,16 @@ func NewCachedRepository(postgresRepository shortener.RedirectRepository, redisR
 
 func (r *cachedRepository) Find(code string) (*shortener.Redirect, error) {
 	redirect, err := r.redisRepository.Find(code)
+	if err == nil {
+		return redirect, nil
 
-	if err != nil {
-		redirect, err := r.repository.Find(code)
-		if err == nil {
-			r.redisRepository.Store(redirect)
-		}
-		return redirect, err
 	}
 
-	return redirect, nil
+	redirect, err = r.repository.Find(code)
+	if err == nil {
+		r.redisRepository.Store(redirect)
+	}
+	return redirect, err
 }
 
 func (r *cachedRepository) Store(redirect *shortener.Redirect) error {
