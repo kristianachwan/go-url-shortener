@@ -15,7 +15,6 @@ import (
 
 func NewServer(logger log.Logger) http.Handler {
 	r := mux.NewRouter()
-	// for now, just postgres
 	repo, err := postgres.NewPostgresRepository("postgres://myuser:mypassword@localhost:5432/mydatabase?sslmode=disable")
 	redisRepo, err := redis.NewRedisRepository("redis://127.0.0.1:6379")
 	if err != nil {
