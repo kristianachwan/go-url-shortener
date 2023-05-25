@@ -20,6 +20,7 @@ func NewServer(logger log.Logger) http.Handler {
 	redisRepo, err := redis.NewRedisRepository("redis://127.0.0.1:6379")
 	if err != nil {
 		logger.Log("error", err)
+		return nil
 	}
 
 	cachedRepository := cachedpostgres.NewCachedRepository(repo, redisRepo)

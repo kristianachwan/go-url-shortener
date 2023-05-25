@@ -1,6 +1,8 @@
 package cachedpostgres
 
-import "github.com/go-url-shortener/shortener"
+import (
+	"github.com/go-url-shortener/shortener"
+)
 
 type cachedRepository struct {
 	repository      shortener.RedirectRepository
@@ -19,7 +21,6 @@ func (r *cachedRepository) Find(code string) (*shortener.Redirect, error) {
 	if err == nil {
 		return redirect, nil
 	}
-
 	redirect, err = r.repository.Find(code)
 	if err == nil {
 		r.redisRepository.Store(redirect)
@@ -28,6 +29,8 @@ func (r *cachedRepository) Find(code string) (*shortener.Redirect, error) {
 }
 
 func (r *cachedRepository) Store(redirect *shortener.Redirect) error {
+	r.redisRepository.Delete(redirect.Code)
+	r.repository.Delete(redirect.Code)
 	return r.repository.Store(redirect)
 }
 

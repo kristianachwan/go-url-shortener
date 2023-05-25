@@ -18,6 +18,16 @@ func NewLoggingMiddleware(logger log.Logger, service shortener.RedirectService) 
 
 func (mw loggingMiddleware) Find(code string) (output *shortener.Redirect, err error) {
 	defer func(begin time.Time) {
+		if output == nil {
+			_ = mw.logger.Log(
+				"method", "find",
+				"input", code,
+				"output", nil,
+				"err", err,
+				"took", time.Since(begin),
+			)
+			return
+		}
 		_ = mw.logger.Log(
 			"method", "find",
 			"input", code,
