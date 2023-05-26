@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/go-url-shortener/shortener"
@@ -32,7 +33,7 @@ func NewPostgresRepository(dbURL string) (shortener.RedirectRepository, error) {
 }
 
 func (r *postgresRepository) Find(code string) (*shortener.Redirect, error) {
-	query := "SELECT code, url, created_at FROM redirects WHERE code = $1"
+	query := "SELECT code, url, created_at, count FROM redirects WHERE code = $1"
 	row := r.db.QueryRow(query, code)
 	redirect := &shortener.Redirect{}
 	var createdAt time.Time
@@ -59,9 +60,9 @@ func (r *postgresRepository) Store(redirect *shortener.Redirect) error {
 }
 
 func (r *postgresRepository) Delete(code string) error {
-	query := "DELETE FROM redirects WHERE code == $1"
+	query := "DELETE FROM redirects WHERE code = $1"
 	_, err := r.db.Exec(query, code)
-
+	fmt.Println(err)
 	if err != nil {
 		return errors.Wrap(err, "repository.Redirect.Delete")
 	}
@@ -70,7 +71,7 @@ func (r *postgresRepository) Delete(code string) error {
 }
 
 func (r *postgresRepository) increment(code string) error {
-	query := "UPDATE redirects SET count = count + 1 WHERE code == $1"
+	query := "UPDATE redirects SET count = count + 1 WHERE code = $1"
 	_, err := r.db.Exec(query, code)
 
 	if err != nil {

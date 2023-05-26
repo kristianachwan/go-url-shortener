@@ -29,8 +29,7 @@ func (r *cachedRepository) Find(code string) (*shortener.Redirect, error) {
 }
 
 func (r *cachedRepository) Store(redirect *shortener.Redirect) error {
-	r.redisRepository.Delete(redirect.Code)
-	r.repository.Delete(redirect.Code)
+	r.Delete(redirect.Code)
 	return r.repository.Store(redirect)
 }
 
