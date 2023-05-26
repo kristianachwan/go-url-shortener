@@ -68,6 +68,7 @@ func (r *redisRepository) Store(redirect *shortener.Redirect) error {
 		"code":       redirect.Code,
 		"url":        redirect.URL,
 		"created_at": redirect.CreatedAt,
+		"count":      redirect.Count,
 	}
 	_, err := r.client.HMSet(key, data).Result()
 	if err != nil {
